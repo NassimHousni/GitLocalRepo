@@ -74,3 +74,61 @@ if __name__ == "__main__":
     )
 
     system_drive = os.environ["SystemDrive"] + "\\"
+
+        # Find the primary active network interface
+    primary_interface = None
+
+    for iface, addr_list in psutil.net_if_addrs().items():
+        stats = psutil.net_if_stats().get(iface)
+
+        if stats and stats.isup:
+            ipv4 = None
+
+            for addr in addr_list:
+                if addr.family == socket.AF_INET and not addr.address.startswith("127."):
+                    ipv4 = addr.address
+
+            if ipv4:
+                primary_interface = iface
+                break
+
+    # Network addresses
+    mac_address = None
+    ipv4_address = None
+    ipv6_address = None
+    ipv6_link_local = None
+
+    if primary_interface:
+        for addr in psutil.net_if_addrs()[primary_interface]:
+
+            if addr.family == psutil.AF_LINK:
+                mac_address = addr.address
+
+            elif addr.family == socket.AF_INET:
+                ipv4_address = addr.address
+
+            elif addr.family == socket.AF_INET6:
+                if addr.address.lower().startswith("fe80"):
+                    ipv6_link_local = addr.address
+                else:
+                    ipv6_address = addr.address
+
+    # Filter only the requested information
+    filtered_info = {
+        "computernaam": socket.gethostname(),
+        "computermodel": result.stdout.strip(),
+        "processor": info["cpu"]["processor"],
+        "physical_cores": info["cpu"]["physical_cores"],
+        "max_cpu_frequency_mhz": round(info["cpu"]["cpu_freq"]["max"], 2),
+        "total_ram_gib": round(info["memory"]["total"] / (1024 ** 3), 2),
+        "filesystem": info["storage"][system_drive]["fstype"],
+        "storage_capacity_gib": round(
+            info["storage"][system_drive]["total"] / (1024 ** 3), 2
+        ),
+        "mac_address": mac_address,
+        "ipv4_address": ipv4_address,
+        "ipv6_address": ipv6_address,
+        "ipv6_link_local": ipv6_link_local
+    }
+
+    print(filtered_info)
