@@ -15,8 +15,7 @@ filtered_info = {
     "computernaam": info["network"]["hostname"],
     "processor": info["cpu"]["processor"],
     "physical_cores": info["cpu"]["physical_cores"],
-    "max_cpu_frequency_mhz": info["cpu"]["cpu_freq"]["max"],
-    "total_ram_gib": round(info["memory"]["total"] / (1024 ** 3), 2)
+    "max_cpu_frequency_mhz": info["cpu"]["cpu_freq"]["max"] if info["cpu"]["cpu_freq"] is not None else None,    "total_ram_gib": round(info["memory"]["total"] / (1024 ** 3), 2)
 }
 
 # Convertir la dictionary Python en JSON
