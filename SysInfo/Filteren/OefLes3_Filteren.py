@@ -126,8 +126,7 @@ if __name__ == "__main__":
         "computermodel": result.stdout.strip(),
         "processor": info["cpu"]["processor"],
         "physical_cores": info["cpu"]["physical_cores"],
-        "max_cpu_frequency_mhz": round(info["cpu"]["cpu_freq"]["max"], 2),
-        "total_ram_gib": round(info["memory"]["total"] / (1024 ** 3), 2),
+"max_cpu_frequency_mhz": round(info["cpu"]["cpu_freq"]["max"], 2) if info["cpu"]["cpu_freq"] is not None else None,        "total_ram_gib": round(info["memory"]["total"] / (1024 ** 3), 2),
         "filesystem": info["storage"][system_drive]["fstype"],
         "storage_capacity_gib": round(
             info["storage"][system_drive]["total"] / (1024 ** 3), 2
