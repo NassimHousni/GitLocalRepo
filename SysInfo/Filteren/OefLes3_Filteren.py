@@ -67,14 +67,21 @@ def collect_system_info():
 if __name__ == "__main__":
     info = collect_system_info()
 
-    result = subprocess.run(
-        ["powershell", "-Command", "(Get-CimInstance Win32_ComputerSystem).Model"],
-        capture_output=True,
-        text=True
-    )
-
-    system_drive = os.environ["SystemDrive"] + "\\"
-
+        # Het besturingssysteem controleren
+    if platform.system() == "Windows":
+        result = subprocess.run(
+            ["powershell", "-Command", "(Get-CimInstance Win32_ComputerSystem).Model"],
+            capture_output=True,
+            text=True
+        )
+        system_drive = os.environ["SystemDrive"] + "\\"
+    else:
+        result = subprocess.run(
+            ["hostnamectl"],
+            capture_output=True,
+            text=True
+        )
+        system_drive = "/"
         # Find the primary active network interface
     primary_interface = None
 
